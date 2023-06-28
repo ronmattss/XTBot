@@ -5,25 +5,39 @@ function readJSONFile(folderPath, fileName) {
     try {
         const absoluteFolderPath = path.join(__dirname, folderPath);
         const filePath = path.join(absoluteFolderPath, fileName);
+
         const fileData = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(fileData);
     } catch (error) {
-        console.error('Error reading JSON file:', error);
+        console.log('No file found!');
         return null;
     }
 }
 
-function writeJSONFile(folderPath, fileName, data) {
+function writeJSONFile(folderPath, fileName, data, overwrite = false) {
     try {
-        const absoluteFolderPath = path.join(__dirname, folderPath);
-        const filePath = path.join(absoluteFolderPath, fileName);
-        const jsonData = JSON.stringify(data, null, 2);
-        fs.writeFileSync(filePath, jsonData);
-        console.log('JSON file written successfully.');
+      const absoluteFolderPath = path.join(__dirname, folderPath);
+      const filePath = path.join(absoluteFolderPath, fileName);
+      const jsonData = JSON.stringify(data, null, 2);
+  
+      // Check if the file already exists
+      if (fs.existsSync(filePath) && !overwrite) {
+        console.log('JSON file already exists. Use the "overwrite" flag to overwrite the file.');
+        return;
+      }
+  
+      // Create the directory if it doesn't exist
+      if (!fs.existsSync(absoluteFolderPath)) {
+        fs.mkdirSync(absoluteFolderPath, { recursive: true });
+      }
+  
+      // Write the JSON file
+      fs.writeFileSync(filePath, jsonData);
+      console.log('JSON file created successfully.');
     } catch (error) {
-        console.error('Error writing JSON file:', error);
+      console.error('Error writing JSON file:', error);
     }
-}
+  }
 
 
 function getAllJSONFilesInFolder(folderPath) {
