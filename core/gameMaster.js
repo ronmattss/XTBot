@@ -4,6 +4,7 @@ const Game = require('../classes/gameClass');
 const { writeJSONFile, readJSONFile } = require('../helpers/jsonWriter');
 let possibleParticipants;
 let currentGame;
+let previousIndex = -1;
 
 
 // a match will be stored in a JSON file which contains properties
@@ -13,10 +14,38 @@ let currentGame;
 
 
 
+// EVENT RANDOMIZER
+function getRandomCategory(categories) {
+  const categoryKeys = Object.keys(categories);
+  const randomIndex = Math.floor(Math.random() * categoryKeys.length);
+  return categoryKeys[randomIndex];
+}
+
+function getRandomEvent(events) {
+  const randomIndex = Math.floor(Math.random() * events.length);
+  return events[randomIndex];
+}
 
 
 
+// Select a random event from the chosen category
+//const randomEvent = getRandomEvent(events, randomCategory);
 
+// console.log('Random Category:', randomCategory);
+// console.log('Random Event:', randomEvent);
+//
+
+
+function TriggerARandomEvent() {
+  const events = readJSONFile("../files/events", "events.json");
+
+  const randomCategory = getRandomCategory(events);
+  const randomEvent = getRandomEvent(events[randomCategory]);
+  console.log("Random Event:", randomEvent);
+  let randomizeEvent = randomEvent;
+
+  return randomizeEvent;
+}
 
 
 function getPossibleParticipants() {
@@ -31,6 +60,32 @@ function checkForGames() {
   else {
     console.log("no games found!");
   }
+}
+
+async function checkCurrentGames(interaction) {
+  const channelId = '400627470048428042'; // Replace with the ID of the channel you want to send the message to
+  const channel = interaction.guild.channels.cache.get(channelId);
+  if (currentGame == undefined) {
+    await channel.send("There are no current games Active!");
+  }
+  else {
+    await channel.send("Starting current game...");
+    // start setInterval function Invoking
+    // load all events
+  }
+
+}
+
+async function startGame(interaction) {
+  const channelId = '400627470048428042'; // Replace with the ID of the channel you want to send the message to
+  const channel = interaction.guild.channels.cache.get(channelId);
+  if (currentGame == undefined) {
+    await channel.send("No current Game detected");
+    return;
+  }
+  // do stuff
+  // Invoke an intro event
+  // start setInterval function
 }
 
 function instantiateGame(gameName, gameLength) {
@@ -49,15 +104,17 @@ function instantiateGame(gameName, gameLength) {
 // Functions for the currentGame
 
 function randomlySelectAParticipant() {
-  return currentGame.participants[13];
+  return getRandomElement(currentGame.participants, previousIndex);
 }
 function saveCurrentGameState() {
   writeJSONFile('../files/games', 'game.json', currentGame, true);
 }
 
+
+
 function removeParticipantInGame(user) {
   console.log("Removing participant: " + user.username);
-  return;
+  console.log(currentGame.checkParticipants())
   for (let i = 0; i < currentGame.checkParticipants.length; i++) {
     const participant = currentGame.checkParticipants[i];
 
@@ -73,7 +130,24 @@ function removeParticipantInGame(user) {
   return false;
 }
 
+// Functions for game events
 
+
+
+
+
+// end functions for game events
+
+
+// Functions for Randomizing things
+function getRandomElement(array, excludedIndex) {
+  const availableIndices = array
+    .map((_, index) => index)
+    .filter(index => index !== excludedIndex);
+
+  const randomIndex = Math.floor(Math.random() * availableIndices.length);
+  return array[availableIndices[randomIndex]];
+}
 
 
 
@@ -108,8 +182,72 @@ function addUserToListOfParticipants(user) {
   return true;
 }
 
+//TODO: EVENT and SETinterval FUNCTIONS
+
+function GameStartEvent() { }
+function GameUpdateEvent() { } // set interval?
+function GameExitEvent() { }
+
+let functionsToInvoke = [];
+let intervalId; // Declare a variable to store the interval ID
+let updateCount = 0;
+
+function updateInvokeCount() {
+  updateCount++;
+}
+
+// WHEN YOU CALL THIS FUNCTION REMOVE IT FROM THE ARRAYLIST
+function removeResetterFunction() {
+  reset(5,invokeFunctions);
+  removeElement(functionsToInvoke,removeResetterFunction);
+}
+
+// This is called every update ()
+function invokeFunctions() {
+  functionsToInvoke.forEach((func) => {
+    func();
+  });
+}
+
+function resetInterval(minutes, callBack) {
+  clearInterval(intervalId); // Clear the existing interval
+  createIntervalInMinutes(callBack, minutes); // Create a new interval with the updated time
+}
+
+functionsToInvoke.push(updateInvokeCount);
+functionsToInvoke.push(removeResetterFunction);
+
+
+
+// STARTS EVENT INVOKING 
+function createIntervalInMinutes(callBack, minutes) {
+  const milliseconds = minutes * 60 * 1000;
+  intervalId = setInterval(callBack, milliseconds);
+}
+
+// RESETS THE INTERVAL
+function reset(minutes, callBack) {
+  setTimeout(() => {
+    resetInterval(minutes, callBack); // Reset the interval to 10 minutes
+  }, 10 * 60 * 1000);
+}
+
+
+
+
+
+// Reset Event Invoking 
+
 
 // Test Function/s
+
+// Array helper
+function removeElement(array, element) {
+  const index = array.indexOf(element);
+  if (index !== -1) {
+    array.splice(index, 1);
+  }
+}
 
 function checkParticipants(client) {
   const guild = client.guilds.cache.get('400626052197646336');
@@ -147,4 +285,4 @@ function checkParticipants(client) {
 
 
 
-module.exports = { checkForGames, randomlySelectAParticipant, removeParticipantInGame, initializeParticipants, addUserToListOfParticipants, checkParticipants, instantiateGame, possibleParticipants }
+module.exports = { TriggerARandomEvent, checkForGames, checkCurrentGames, randomlySelectAParticipant, removeParticipantInGame, initializeParticipants, addUserToListOfParticipants, checkParticipants, instantiateGame, possibleParticipants }

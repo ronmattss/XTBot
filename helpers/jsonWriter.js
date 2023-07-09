@@ -5,7 +5,7 @@ function readJSONFile(folderPath, fileName) {
     try {
         const absoluteFolderPath = path.join(__dirname, folderPath);
         const filePath = path.join(absoluteFolderPath, fileName);
-
+        console.log(filePath);
         const fileData = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(fileData);
     } catch (error) {

@@ -1,0 +1,59 @@
+{
+  "GeneralEvents": [
+    "The XT Game has begun!",
+    "The horn starts and the games begin",
+    "The gates are closing soon"
+  ],
+  "CharacterEvents": [
+    "{Name} ran away from the plaza",
+    "{Name} loots a bag full of explosives",
+    "{Name} finds a full bottle of water",
+    "{Name} explores the school",
+    "{Name} goes to the canteen to look for food",
+    "{Name} loots the bookstore",
+    "{Name} hides in the library",
+    "{Name}, {Name}, and {Name} teams up and hunters other players",
+    "{Name} skips the {PassiveEvent}",
+    "{Name} was chased by Vanj",
+    "{Name} gets caught by Vanj and gets locked up for the rest of the day",
+    "{Name} gets caught by Vanj and gets their loot taken away",
+    "{Name} gets hit by a random chalk to the head and knocks them out unconcious",
+    "{Name} gets sent to the PD office and barely makes it out alive",
+    "{Name} camps by the outside altar",
+    "{Name} gets food poisoning from the canteen",
+    "{Name} hijacks a tricycle in the parking lot",
+    "{Name} starts making meth in the science lab",
+    "{Name} hides in the computer lab",
+    "{Name} provokes a gang way in the parking lot",
+    "{Name} breaks their legs after the old wooden stairs breaks under their weight"
+  ],
+  "PassiveEvents": [
+    "A supply drop has been delivered to {Place}",
+    "12 PM Angelus Prayer",
+    "3 o'clock prayer"
+  ],
+  "KillEvents": [
+    "{Name} has slashed {Name} with a box cutter",
+    "{Name} kills {Name} with a pencil",
+    "{Name} Nothing personal'd {Name} with a broken ruler he picked up from a classroom",
+    "{Name} hit {Name} with the 'ol razzle-dazzle and put 'em in a coma",
+    "{Name} crossedover {Name} breaking their ankles forcing them to forfeit the game",
+    "{Name} spat some BCC drinking fountain water on {Name} melting their skin",
+    "Mr. San Jose out of nowhere violates {Name} traumatizing them",
+    "{Name} 360 noscopes {Name} with a sniper rifle",
+    "{Name} lures {Name} into a classroom and kills them",
+    "{Name} bodyslams {Name} to death",
+    "{Name} forces {Name} to drink from BCC's drinking fountain and poisons them",
+    "{Name} dies after having an electric fan fall on them",
+    "{Name} pushes {Name} off the fourth floor",
+    "{Name} enters a classroom, slips on a bunot, and breaks their neck",
+    "{Name} dumps {Name}'s head into a bucket full of varnish",
+    "{Name} goes into one of the school's comfort room and was never seen again",
+    "{Name}, {Name}, and {Name} waits for {Name} by the gate and kills them",
+    "{Name} runs over {Name} using their tricycle",
+    "{Name} crashes their tricycle into a wall and gets caught in the explosion",
+    "{Name} gets crushed by debris in the church",
+    "{Name} freezes in the AV room",
+    "{Name} was caught in a crossfire"
+  ]
+}

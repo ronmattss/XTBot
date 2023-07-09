@@ -12,7 +12,7 @@ module.exports = {
         const channel = interaction.guild.channels.cache.get(channelId);
         //remove participant from the game
         const user = randomlySelectAParticipant();
-        removeParticipantInGame(user);
+       // removeParticipantInGame(user);
         const mention = `<@${user.id}>`;
         await interaction.reply({ content: "Removing player...", ephemeral: false });
         await channel.send(`${mention} + Some custom Event Message here`);

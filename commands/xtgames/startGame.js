@@ -1,25 +1,23 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { instantiateGame, possibleParticipants } = require('../../core/gameMaster');
+const { instantiateGame,checkCurrentGames, possibleParticipants } = require('../../core/gameMaster');
 
 module.exports = {
 	cooldown: 1,
 	data: new SlashCommandBuilder()
-		.setName('newgame')
-		.setDescription('Start a new game !'),
+		.setName('start-game')
+		.setDescription('Start the current game !'),
 	async execute(interaction) {
-		// check if there are current games active:
-		// if none then create new one
-		// if there is one then select it and prompt currently on-going
-		// add participants
 
-		// interaction.user is the object representing the User who ran the command
-		// interaction.member is the GuildMember object, which represents the user in the specific guild
+
 		await interaction.reply({ content: 'checking for current games...', ephemeral: true });
-		let game = instantiateGame("XT GAMES", 5);
-		await channel.send(interaction.user.username + ` Created a new Kill Event : ` + event);
-
+		let game = instantiateGame("XT GAMES",5);
 		console.log(game.participants.length);
-		let events = readJSONFile("../files/events", "events.json");
+        checkCurrentGames(interaction);
+
+        
+        // starts the current game
+        // loads all Events that will be used in the game
+        // Game will end if only one player remains
 
 
 
