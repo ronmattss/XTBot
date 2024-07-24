@@ -1,3 +1,4 @@
 @echo off
-start "" cmd /c "node index.js & pause"
+cd C:\ProgramData\Jenkins\.jenkins\workspace\discord-bot-pipeline
+start "" cmd /c "node index.js"
 exit
