@@ -41,7 +41,7 @@ function TriggerARandomEvent() {
 
   const randomCategory = getRandomCategory(events);
   const randomEvent = getRandomEvent(events[randomCategory]);
-  console.log("Random Event:", randomEvent);
+  //console.log("Random Event:", randomEvent);
   let randomizeEvent = randomEvent;
 
   return randomizeEvent;
@@ -62,14 +62,14 @@ function checkForGames() {
   }
 }
 
-async function checkCurrentGames(interaction) {
-  const channelId = '400627470048428042'; // Replace with the ID of the channel you want to send the message to
-  const channel = interaction.guild.channels.cache.get(channelId);
+function checkCurrentGames(interaction) {
   if (currentGame == undefined) {
-    await channel.send("There are no current games Active!");
+    return null;
   }
   else {
-    await channel.send("Starting current game...");
+
+    currentGame.isActive = true;
+    return currentGame;
     // start setInterval function Invoking
     // load all events
   }
@@ -189,20 +189,30 @@ function GameUpdateEvent() { } // set interval?
 function GameExitEvent() { }
 
 let functionsToInvoke = [];
-let intervalId; // Declare a variable to store the interval ID
+let currentIntervalID; // Declare a variable to store the interval ID
 let updateCount = 0;
+let intervalSeconds = 2;
+let intervalMinutes = 1;
+let intervals = [];
+
+function getEventIntervalID() { return currentIntervalID; }
 
 function updateInvokeCount() {
+  console.log(`Invoking ${updateCount}`);
+  for (const element of intervals) {
+    console.log(`Interval ID: ${element}`);
+  }
   updateCount++;
 }
 
 // WHEN YOU CALL THIS FUNCTION REMOVE IT FROM THE ARRAYLIST
 function removeResetterFunction() {
-  reset(5,invokeFunctions);
-  removeElement(functionsToInvoke,removeResetterFunction);
+  resetInterval(1, invokeFunctions);
+  console.log("removing function");
+  removeElement(functionsToInvoke, removeResetterFunction);
 }
 
-// This is called every update ()
+// This is called every update()
 function invokeFunctions() {
   functionsToInvoke.forEach((func) => {
     func();
@@ -210,19 +220,85 @@ function invokeFunctions() {
 }
 
 function resetInterval(minutes, callBack) {
-  clearInterval(intervalId); // Clear the existing interval
-  createIntervalInMinutes(callBack, minutes); // Create a new interval with the updated time
+  // Clear the existing interval
+  console.log("clearing: " + currentIntervalID);
+  clearInterval(currentIntervalID);
+  createInterval(callBack, minutes, "hours", true);
+  // Create a new interval with the updated time
+}
+// Function to end the game
+async function endGame() {
+  if (currentGame.participants.length <= 1) {
+    clearInterval(intervalId);
+    // Change this to the last person standing
+    let parsedString = parseEvent(TriggerARandomEvent());
+    const channelId = '400627470048428042'; // Replace with the ID of the channel you want to send the message to
+    const channel = interactionChannel.guild.channels.cache.get(channelId);
+    await channel.send(`${currentHour} ${currentMinute} Random Event Test: ${parsedString}`);
+    console.log(parsedString);
+
+  }
+  console.log(`Number of participants ${currentGame.participants.length}`);
 }
 
 functionsToInvoke.push(updateInvokeCount);
-functionsToInvoke.push(removeResetterFunction);
-
-
+functionsToInvoke.push(invokableRandomInGameEventHandler);
+functionsToInvoke.push(removeResetterFunction); // For Testing?
 
 // STARTS EVENT INVOKING 
-function createIntervalInMinutes(callBack, minutes) {
-  const milliseconds = minutes * 60 * 1000;
-  intervalId = setInterval(callBack, milliseconds);
+// THIS IS THE ONLY THING YOU NEED TO CALL IN THE START 
+function startIntervalInvoker() {
+  console.log("Starting XT GAMES");
+  createInterval(invokeFunctions, 1, "hours", true);
+}
+// function createIntervalInMinutes(callBack, minutes) {
+//   const milliseconds = minutes * 60 * 1000;
+//   intervalId = setInterval(callBack, milliseconds);
+// }
+
+function createInterval(callBack, interval, unit, checkHourly) {
+  let milliseconds;
+
+  switch (unit) {
+    case 'seconds':
+      milliseconds = interval * 1000;
+      break;
+    case 'minutes':
+      milliseconds = interval * 60 * 1000;
+      break;
+    case 'hours':
+      milliseconds = interval * 60 * 60 * 1000;
+      break;
+    default:
+      throw new Error('Invalid interval unit');
+  }
+
+  if (checkHourly && unit === 'hours') {
+    // Calculate the delay until the next hour
+    const now = new Date();
+    const currentMinute = now.getMinutes();
+    const minutesToNextHour = 60 - currentMinute;
+    const delay = minutesToNextHour * 60 * 1000; // Convert minutes to milliseconds
+
+    // Invoke the callback function initially
+    // callBack();
+    console.log(`invoking in: ${minutesToNextHour} ${delay}`);
+    // Schedule subsequent invocations at the start of every hour
+    console.log("Updating every hour");
+
+    // clearInterval(currentIntervalID);
+
+    currentIntervalID = setInterval(() => {
+      callBack();
+    }, delay);
+  } else {
+    // Invoke the callback function initially
+    // callBack();
+
+    // Schedule subsequent invocations at the specified interval
+    currentIntervalID = setInterval(callBack, milliseconds);
+    intervals.push(currentIntervalID);
+  }
 }
 
 // RESETS THE INTERVAL
@@ -232,11 +308,11 @@ function reset(minutes, callBack) {
   }, 10 * 60 * 1000);
 }
 
+// Stop the Interval
+function stopEventInvokation() {
+  clearInterval(currentIntervalID);
+}
 
-
-
-
-// Reset Event Invoking 
 
 
 // Test Function/s
@@ -247,6 +323,51 @@ function removeElement(array, element) {
   if (index !== -1) {
     array.splice(index, 1);
   }
+}
+
+// Array Helper End
+
+// string Helper
+
+// This is the one that will be displayed in the 
+function parseEvent(eventString) {
+  if (eventString.includes("{Name}")) {
+    const parsedEventString = eventString.replace(/{Name}/g, () => changeUserToMention());
+    return parsedEventString;
+  }
+  return eventString;
+}
+
+function changeUserToMention() {
+  let x = randomlySelectAParticipant();
+  const mention = `<@${x.id}>`;
+  //const mention = `${x.username}`;
+  return mention;
+}
+let interactionChannel;
+function setChannel(currentChannel) {
+  interactionChannel = currentChannel;
+  // console.log(interactionChannel);
+}
+
+function invokableRandomInGameEventHandler() {
+  invokeRandomInGameEvent(interactionChannel);
+}
+async function invokeRandomInGameEvent(interactionChannel) {
+  // Get the current date and time
+  const now = new Date();
+
+  // Get the current hour (in 24-hour format)
+  const currentHour = now.getHours();
+
+  // Get the current minute
+  const currentMinute = now.getMinutes();
+  let parsedString = parseEvent(TriggerARandomEvent());
+  const channelId = '400627470048428042'; // Replace with the ID of the channel you want to send the message to
+  const channel = interactionChannel.guild.channels.cache.get(channelId);
+  await channel.send(`${currentHour} ${currentMinute} Random Event Test: ${parsedString}`);
+  console.log(parsedString);
+
 }
 
 function checkParticipants(client) {
@@ -285,4 +406,4 @@ function checkParticipants(client) {
 
 
 
-module.exports = { TriggerARandomEvent, checkForGames, checkCurrentGames, randomlySelectAParticipant, removeParticipantInGame, initializeParticipants, addUserToListOfParticipants, checkParticipants, instantiateGame, possibleParticipants }
+module.exports = { setChannel, TriggerARandomEvent, startIntervalInvoker, checkForGames, checkCurrentGames, randomlySelectAParticipant, removeParticipantInGame, initializeParticipants, addUserToListOfParticipants, checkParticipants, instantiateGame, possibleParticipants }

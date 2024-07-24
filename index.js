@@ -1,12 +1,53 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits,Intents  } = require('discord.js');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+
 const { token } = require('./config.json');
 
-const client = new Client({ 
-	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+const app = express();
+const port = 3000; // You can change the port if needed
+
+  // Express middleware to parse JSON requests
+  app.use(bodyParser.json());
+  
+  // Endpoint to receive data from Arduino
+  app.post('/arduino-data', (req, res) => {
+	const { data } = req.body;
+	
+	// Process the data from Arduino
+	console.log('Received data from Arduino:', data);
+  
+	// You can send a response back if needed
+	//res.send('Data received successfully!');
+  });
+  app.get('/sample', (req, res) => {
+	console.log('Hello');
+	res.send('Hello from the server!');
   });
 
+  app.post('/sendReadings', (req, res) => {
+	// Access the JSON data sent from Arduino
+	const jsonData = req.body;
+  
+	// Process the data as needed
+	console.log('Received JSON data:', jsonData);
+	sendReadingsToDiscord(jsonData);
+	// Send a response if necessary
+	res.json({ message: 'Data received successfully' });
+  });
+
+
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildVoiceStates
+    ],
+});
+global.discordClient = client;
 client.commands = new Collection();
 client.cooldowns = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -28,6 +69,45 @@ for (const folder of commandFolders) {
 
 // Event Handlers
 
+// client.on('voiceStateUpdate', (oldState, newState) => {
+// 	const minDelay = 30000; // 10 seconds
+//     const maxDelay = 90000; // 60 seconds
+//     const disconnectDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+// 	if(oldState.channel)
+// 	{
+// 		if(oldState.member.user.tag  === "skevved#0")
+// 		{
+// 			console.log("here");
+// 		}
+// 	}
+// 	setTimeout(() => {
+			
+// 		// Check if the member is still in a voice channel before disconnecting
+// 		if (oldState.member.user.tag === "skevved#0") {
+// 			console.log(`${oldState.member.user.tag} disconnecting...`);
+// 			// oldState.member.voice.setMute(newState.member.voice)
+// 			oldState.member.voice.disconnect();
+// 			console.log(`${oldState.member.user.tag} disconnected after n seconds`);
+// 		}
+// 	}, disconnectDelay);
+//     // Check if the member joined a voice channel
+//     if (!oldState.channel && newState.channel) {
+//         console.log(`${newState.member.user.tag} joined a voice channel: ${newState.channel.name}`);
+//         setTimeout(() => {
+			
+// 			console.log(`disconnecting after ${disconnectDelay}`)
+//             // Check if the member is still in a voice channel before disconnecting
+//             if (newState.member.user.tag === "skevved#0") {
+// 				// newState.member.voice.setMute(newState.member.voice)
+// 				newState.member.voice.disconnect();
+//                 console.log(`${newState.member.user.tag} disconnected after n seconds`);
+//             }
+//         }, disconnectDelay);
+
+//         // Do something here, such as sending a message or performing an action
+//     }
+// });
+
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -40,5 +120,40 @@ for (const file of eventFiles) {
 		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
+
+
+function disconnectAfterDelay(member, delay) {
+
+}
+
+function sendReadingsToDiscord(data) {
+	const channel = client.channels.cache.get("1183248453606850570");
+  
+	if (channel) {
+	  const timestamp = new Date().toLocaleString(); // Get the current date and time
+  
+	  const message = `
+		**Timestamp:** ${timestamp}
+		**Temperature:** ${data.bme280.currentTemp} °C
+		**Humidity:** ${data.bme280.currentHumidity} %
+		**Altitude:** ${data.bme280.currentAltitude} meters
+		**Pressure:** ${data.bme280.currentPressure} hPa
+		**PPM:** ${data.currentPPM}
+	  `;
+  
+	  channel.send(message);
+	} else {
+	  console.error(`Channel with ID ${"1183248453606850570"} not found.`);
+	}
+  }
+
+  // Start the Express server
+  const serverIPAddress = require('ip').address();
+  console.log(`Server IP Address: ${serverIPAddress}`);
+  
+  // Start the Express server
+  const server = app.listen(port, () => {
+	console.log(`Express server listening on http://${serverIPAddress}:${port}`);
+  });
 
 client.login(token);

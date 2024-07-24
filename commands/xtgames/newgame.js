@@ -18,8 +18,13 @@ module.exports = {
 		let game = instantiateGame("XT GAMES", 5);
 		await channel.send(interaction.user.username + ` Created a new Kill Event : ` + event);
 
-		console.log(game.participants.length);
+		//console.log(game.participants.length);
 		let events = readJSONFile("../files/events", "events.json");
+
+		const generalEvents = events.GeneralEvents;
+		const characterEvents = events.CharacterEvents;
+		const passiveEvents = events.PassiveEvents;
+		const killEvents = events.KillEvents;
 
 
 
