@@ -1,4 +1,3 @@
 @echo off
-REM Run the node command
-node index.js
-pause
+start "" cmd /c "node index.js & pause"
+exit
