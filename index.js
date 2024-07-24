@@ -5,7 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 
-const { token } = require('./config.json');
+const { token } = require(path.join('C:', 'keys', 'config.json'));
 
 const app = express();
 const port = 3000; // You can change the port if needed
