@@ -3,10 +3,10 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits,Intents  } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 
-
-const { token } = require(path.join('C:', 'keys', 'config.json'));
-
+//const { token } = require(path.join('C:', 'keys', 'config.json'));
+const loginToken = process.env.DISCORD_TOKEN;
 const app = express();
 const port = 3000; // You can change the port if needed
 
@@ -156,4 +156,4 @@ function sendReadingsToDiscord(data) {
 	console.log(`Express server listening on http://${serverIPAddress}:${port}`);
   });
 
-client.login(token);
+client.login(loginToken);
