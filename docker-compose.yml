@@ -1,8 +1,11 @@
-version: '3'
+version: '3.8'
+
 services:
   xtbot:
+    image: xtbot-image
     build: .
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
     ports:
       - "3000:3000"
+    restart: unless-stopped

@@ -1,18 +1,20 @@
+# Use the official Node.js image
 FROM node:14
 
-# Create app directory
+# Create and change to the app directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
+# Copy package.json and package-lock.json files
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
-# Bundle app source
+# Copy the rest of the application
 COPY . .
 
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 3000
 
-# Command to run the app
+# Start the bot
 CMD [ "node", "index.js" ]
