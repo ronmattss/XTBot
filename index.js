@@ -9,7 +9,8 @@ require('dotenv').config();
 const loginToken = process.env.DISCORD_TOKEN;
 const app = express();
 const port = 3000; // You can change the port if needed
-
+const notificationChannelId = '1183248453606850570'; // Replace with your channel ID
+const notificationUserId = '400626723181428737'; // Replace with the user ID to notify
   // Express middleware to parse JSON requests
   app.use(bodyParser.json());
   
@@ -121,10 +122,61 @@ for (const file of eventFiles) {
 	}
 }
 
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+    }
+});
+
 
 function disconnectAfterDelay(member, delay) {
 
 }
+
+client.on('messageCreate', message => {
+    if (message.author.bot) return;
+
+    const content = message.content.toLowerCase();
+    const trackWordCommand = client.commands.get('trackword');
+    if (content.includes(trackWordCommand.getWordToTrack().toLowerCase())) {
+        trackWordCommand.updateLeaderboard(message.author.id);
+    }
+});
+
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+    }
+});
+
+client.once('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    const channel = client.channels.cache.get(notificationChannelId);
+
+    if (channel) {
+        await channel.send({ content: 'Bot is now online!', ephemeral: true });
+    } else {
+        console.error(`Notification channel with ID ${notificationChannelId} not found.`);
+    }
+});
 
 function sendReadingsToDiscord(data) {
 	const channel = client.channels.cache.get("1183248453606850570");
