@@ -158,6 +158,7 @@ client.on('interactionCreate', async interaction => {
 
     try {
 		console.log(`attempting to interact ${interaction.commandName}`);
+		await interaction.deferReply({ ephemeral: true });
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
