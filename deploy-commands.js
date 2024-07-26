@@ -8,8 +8,10 @@ const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 const token = process.env.DISCORD_TOKEN;
-const clientId = process.env.DISCORD_CLIENT;
-const guildId = process.env.DISCORD_GUILD;
+const clientId = '1122447858860314685';
+//const clientId = process.env.DISCORD_CLIENT;
+const guildId = '400626052197646336';
+//const guildId = process.env.DISCORD_GUILD;
 for (const folder of commandFolders) {
     // Grab all the command files from the commands directory you created earlier
     const commandsPath = path.join(foldersPath, folder);
