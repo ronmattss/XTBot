@@ -1,22 +1,21 @@
+const fs = require('fs');
+const path = require('path');
 const { REST, Routes } = require('discord.js');
-
-const fs = require('node:fs');
-const path = require('node:path');
+require('dotenv').config();
 
 const commands = [];
-// Grab all the command files from the commands directory you created earlier
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
+
 const token = process.env.DISCORD_TOKEN;
 const clientId = '1122447858860314685';
 //const clientId = process.env.DISCORD_CLIENT;
 const guildId = '400626052197646336';
 //const guildId = process.env.DISCORD_GUILD;
+
 for (const folder of commandFolders) {
-    // Grab all the command files from the commands directory you created earlier
-    const commandsPath = path.join(foldersPath, folder);
+    const commandsPath = path.join(commandsPath, folder);
     const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-    // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
@@ -28,23 +27,35 @@ for (const folder of commandFolders) {
     }
 }
 
-// Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+const rest = new REST({ version: '10' }).setToken(token);
 
-// and deploy your commands!
 (async () => {
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-        // The put method is used to fully refresh all commands in the guild with the current set
-        const data = await rest.put(
-            Routes.applicationGuildCommands(clientId, guildId),
-            { body: commands },
+        // Fetch the existing commands
+        const existingCommands = await rest.get(
+            Routes.applicationGuildCommands(clientId, guildId)
         );
 
-        console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+        // Filter out commands that are already registered
+        const newCommands = commands.filter(cmd => 
+            !existingCommands.some(existingCmd => existingCmd.name === cmd.name)
+        );
+
+        if (newCommands.length > 0) {
+            // Register only new commands
+            const data = await rest.put(
+                Routes.applicationGuildCommands(clientId, guildId),
+                { body: newCommands }
+            );
+            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+        } else {
+            console.log('No new commands to register.');
+        }
     } catch (error) {
-        // And of course, make sure you catch and log any errors!
         console.error(error);
     }
 })();
+
+
