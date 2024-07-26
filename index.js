@@ -14,6 +14,8 @@ const app = express();
 const port = 3000; // You can change the port if needed
 const notificationChannelId = '1183248453606850570'; // Replace with your channel ID
 const notificationUserId = '400626723181428737'; // Replace with the user ID to notify
+const clientId = '1122447858860314685';
+const guildId = '400626052197646336';
   // Express middleware to parse JSON requests
   app.use(bodyParser.json());
   
