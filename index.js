@@ -6,9 +6,10 @@ const bodyParser = require('body-parser');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
-
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
 const loginToken = process.env.DISCORD_TOKEN;
+const clientID = process.env.DISCORD_CLIENT;
+const guildID = process.env.DISCORD_GUILD;
 const app = express();
 const port = 3000; // You can change the port if needed
 const notificationChannelId = '1183248453606850570'; // Replace with your channel ID
@@ -62,6 +63,7 @@ for (const folder of commandFolders) {
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
+		// Set a new item in the Collection with the key as the command name and the value as the exported module
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
 		} else {
@@ -85,26 +87,7 @@ for (const file of eventFiles) {
 }
 
 
-// Register commands with Discord API
-async function deployCommands() {
-    const commands = [];
-    client.commands.forEach(command => commands.push(command.data.toJSON()));
 
-    const rest = new REST({ version: '9' }).setToken(loginToken);
-
-    try {
-        console.log('Started refreshing application (/) commands.');
-
-        await rest.put(
-            Routes.applicationGuildCommands(clientId, guildId),
-            { body: commands }
-        );
-
-        console.log('Successfully reloaded application (/) commands.');
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 // Event Handlers
 
@@ -148,21 +131,6 @@ async function deployCommands() {
 // });
 
 
-
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
-
-    const command = client.commands.get(interaction.commandName);
-
-    if (!command) return;
-
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
-});
 
 
 function disconnectAfterDelay(member, delay) {
