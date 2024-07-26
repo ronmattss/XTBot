@@ -7,7 +7,6 @@ module.exports = {
         .setDescription('Replies with Pong!'),
     async execute(interaction) {
         await interaction.deferReply({ content: 'We are Checking!', ephermal: true });
-        await wait(1000);
-        await interaction.editReply({ content: 'Pong!', ephermal: true });
+        interaction.editReply({ content: 'Pong!', ephermal: true });
     },
 };
