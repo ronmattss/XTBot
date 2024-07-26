@@ -149,24 +149,23 @@ client.on('messageCreate', message => {
     }
 });
 
-// client.on('interactionCreate', async interaction => {
-//     if (!interaction.isCommand()) return;
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
 
-//     const command = client.commands.get(interaction.commandName);
+    const command = client.commands.get(interaction.commandName);
 
-//     if (!command) return;
+    if (!command) return;
 
-//     try {
-//         await command.execute(interaction);
-//     } catch (error) {
-//         console.error(error);
-//         if (!interaction.replied) {
-//             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-//         } else {
-//             await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-//         }
-//     }
-// });
+    try {
+		console.log(`attempting to interact ${interaction.commandName}`);
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (!interaction.replied) {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
+});
 
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
