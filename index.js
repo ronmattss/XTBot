@@ -149,24 +149,7 @@ client.on('messageCreate', message => {
     }
 });
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
 
-    const command = client.commands.get(interaction.commandName);
-
-    if (!command) return;
-
-    try {
-		console.log(`attempting to interact ${interaction.commandName}`);
-		//await interaction.deferReply({ ephemeral: true });
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        if (!interaction.replied) {
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
-    }
-});
 
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -243,5 +226,25 @@ function sendReadingsToDiscord(data) {
   const server = app.listen(port, () => {
 	console.log(`Express server listening on http://${serverIPAddress}:${port}`);
   });
+
+
+  client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+        console.log(`attempting to interact ${interaction.commandName}`);
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (!interaction.replied) {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
+});
+
 
 client.login(loginToken);
