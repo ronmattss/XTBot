@@ -3,6 +3,8 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits,Intents  } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
 
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
@@ -68,6 +70,42 @@ for (const folder of commandFolders) {
 	}
 }
 
+
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
+
+
+// Register commands with Discord API
+async function deployCommands() {
+    const commands = [];
+    client.commands.forEach(command => commands.push(command.data.toJSON()));
+
+    const rest = new REST({ version: '9' }).setToken(loginToken);
+
+    try {
+        console.log('Started refreshing application (/) commands.');
+
+        await rest.put(
+            Routes.applicationGuildCommands(clientId, guildId),
+            { body: commands }
+        );
+
+        console.log('Successfully reloaded application (/) commands.');
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 // Event Handlers
 
 // client.on('voiceStateUpdate', (oldState, newState) => {
@@ -109,34 +147,7 @@ for (const folder of commandFolders) {
 //     }
 // });
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
-}
-
-// Register commands with Discord
-const rest = new REST({ version: '10' }).setToken(loginToken);
-
-(async () => {
-    try {
-        console.log('Started refreshing application (/) commands.');
-        await rest.put(
-            Routes.applicationCommands(clientId),
-            { body: commands },
-        );
-        console.log('Successfully reloaded application (/) commands.');
-    } catch (error) {
-        console.error(error);
-    }
-})();
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
@@ -192,6 +203,7 @@ client.once('ready', async () => {
     } else {
         console.error(`Notification channel with ID ${notificationChannelId} not found.`);
     }
+    await deployCommands();
 });
 
 function sendReadingsToDiscord(data) {
