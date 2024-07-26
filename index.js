@@ -171,7 +171,7 @@ client.once('ready', async () => {
     } else {
         console.error(`Notification channel with ID ${notificationChannelId} not found.`);
     }
-    await deployCommands();
+   // await deployCommands();
 });
 
 function sendReadingsToDiscord(data) {
