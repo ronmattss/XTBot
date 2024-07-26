@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-
+const wait = require('node:timers/promises').setTimeout;
 let wordToTrack = 'crack';
 let leaderboard = {};
 

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { readJSONFile, writeJSONFile } = require('../../helpers/jsonWriter');
-
+const wait = require('node:timers/promises').setTimeout;
 function addEvent(events, eventType, event) {
     let eventCategory;
 
