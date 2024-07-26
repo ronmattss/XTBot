@@ -38,7 +38,7 @@ const rest = new REST().setToken(token);
 
         // Fetch the existing commands
         const existingCommands = await rest.get(
-            Routes.applicationGuildCommands(clientId, process.env.GUILD_ID)
+            Routes.applicationGuildCommands(clientId, guildId)
         );
 
         // Filter out commands that are already registered
@@ -49,7 +49,7 @@ const rest = new REST().setToken(token);
         // Register new commands without removing existing ones
         for (const command of newCommands) {
             await rest.post(
-                Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+                Routes.applicationGuildCommands(clientId, guildId),
                 { body: command }
             );
         }
