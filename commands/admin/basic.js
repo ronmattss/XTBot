@@ -6,8 +6,7 @@ module.exports = {
         .setName('ping')
         .setDescription('Replies with Pong!'),
     async execute(interaction) {
-        await interaction.deferReply();
-        await wait(4_000);
-        await interaction.editReply({ content: 'Pong!', ephermal: true });
+        await interaction.reply({ content: 'We are Checking!', ephermal: true });
+        await interaction.followUp({ content: 'Pong!', ephermal: true });
     },
 };
