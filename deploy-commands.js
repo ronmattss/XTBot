@@ -38,7 +38,7 @@ const rest = new REST().setToken(token);
 
         // Fetch the existing commands
         const existingCommands = await rest.get(
-            Routes.applicationGuildCommands(clientId, guildId)
+            Routes.applicationGuildCommands(clientId, process.env.GUILD_ID)
         );
 
         // Filter out commands that are already registered
@@ -46,16 +46,15 @@ const rest = new REST().setToken(token);
             !existingCommands.some(existingCmd => existingCmd.name === cmd.name)
         );
 
-        if (newCommands.length > 0) {
-            // Register only new commands
-            const data = await rest.put(
-                Routes.applicationGuildCommands(clientId, guildId),
-                { body: newCommands }
+        // Register new commands without removing existing ones
+        for (const command of newCommands) {
+            await rest.post(
+                Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+                { body: command }
             );
-            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-        } else {
-            console.log('No new commands to register.');
         }
+
+        console.log(`Successfully added ${newCommands.length} new commands.`);
     } catch (error) {
         console.error(error);
     }
