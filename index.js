@@ -122,6 +122,22 @@ for (const file of eventFiles) {
 	}
 }
 
+// Register commands with Discord
+const rest = new REST({ version: '10' }).setToken(loginToken);
+
+(async () => {
+    try {
+        console.log('Started refreshing application (/) commands.');
+        await rest.put(
+            Routes.applicationCommands(clientId),
+            { body: commands },
+        );
+        console.log('Successfully reloaded application (/) commands.');
+    } catch (error) {
+        console.error(error);
+    }
+})();
+
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
