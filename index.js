@@ -147,20 +147,24 @@ client.on('messageCreate', message => {
     }
 });
 
-// client.on('interactionCreate', async interaction => {
-//     if (!interaction.isCommand()) return;
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
 
-//     const command = client.commands.get(interaction.commandName);
+    const command = client.commands.get(interaction.commandName);
 
-//     if (!command) return;
+    if (!command) return;
 
-//     try {
-//         await command.execute(interaction);
-//     } catch (error) {
-//         console.error(error);
-//         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-//     }
-// });
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        if (!interaction.replied) {
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        } else {
+            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+    }
+});
 
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -173,6 +177,40 @@ client.once('ready', async () => {
     }
    // await deployCommands();
 });
+
+// Deploy commands when the bot starts
+const deployCommands = async () => {
+    const commands = [];
+    for (const [name, command] of client.commands) {
+        commands.push(command.data.toJSON());
+    }
+
+    const rest = new REST({ version: '10' }).setToken(loginToken);
+    try {
+        console.log('Started refreshing application (/) commands.');
+
+        const existingCommands = await rest.get(
+            Routes.applicationGuildCommands(clientId, guildId)
+        );
+
+        const newCommands = commands.filter(cmd => 
+            !existingCommands.some(existingCmd => existingCmd.name === cmd.name)
+        );
+
+        for (const command of newCommands) {
+            await rest.post(
+                Routes.applicationGuildCommands(clientId, guildId),
+                { body: command }
+            );
+        }
+
+        console.log(`Successfully added ${newCommands.length} new commands.`);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+deployCommands();
 
 function sendReadingsToDiscord(data) {
 	const channel = client.channels.cache.get("1183248453606850570");
