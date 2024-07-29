@@ -43,7 +43,7 @@ async function fetchMessages(channel) {
 
         const messages = await channel.messages.fetch(options);
         whileLimit++;
-        console.log(`:::${whileLimit} Fetched ${messages.size} messages`);
+        console.log(`:::${whileLimit} Fetching ${messages.size} messages`);
 
         if (messages.size === 0) {
             break;
