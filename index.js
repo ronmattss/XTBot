@@ -106,12 +106,12 @@ if (!fs.existsSync(path.dirname(messagesFilePath))) {
 
 
 // Load existing messages or initialize an empty array
-let messagess = [];
-if (fs.existsSync(messagesFilePath)) {
-  messagess = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
-} else {
-    fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
-}
+// let messagess = [];
+// if (fs.existsSync(messagesFilePath)) {
+//   messagess = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
+// } else {
+//     fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
+// }
 // Initialize tracked word from config
 const initialWord = config.initialWord;
 wordLeaderboard.setWordToTrack(initialWord);
