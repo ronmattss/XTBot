@@ -7,7 +7,7 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
 const config = require('./wordTrackerConfig.json');
-const wordLeaderboard = require('./wordLeaderboard');
+const wordLeaderboard = require('./commands/admin/wordLeaderboard');
 
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
 const loginToken = process.env.DISCORD_TOKEN;
