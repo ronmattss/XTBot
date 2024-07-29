@@ -151,7 +151,7 @@ function disconnectAfterDelay(member, delay) {
 
 client.on('messageCreate', message => {
   if (message.author.bot) return;
-
+  console.log(`reading message: ${message.author}: ${message.content}}`);
   const content = message.content.toLowerCase();
   if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
       wordLeaderboard.updateLeaderboard(message.author.id);
@@ -173,25 +173,25 @@ client.once('ready', async () => {
    // await deployCommands();
 });
 
-client.on('interactionCreate', async interaction => {
-  if (!interaction.isCommand()) return;
+// client.on('interactionCreate', async interaction => {
+//   if (!interaction.isCommand()) return;
 
-  const command = client.commands.get(interaction.commandName);
+//   const command = client.commands.get(interaction.commandName);
 
-  if (!command) return;
+//   if (!command) return;
 
-  try {
-      console.log(`Attempting to execute ${interaction.commandName}`);
-      await command.execute(interaction);
-  } catch (error) {
-      console.error(`Error executing ${interaction.commandName}`, error);
-      if (interaction.replied || interaction.deferred) {
-          await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-      } else {
-          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-      }
-  }
-});
+//   try {
+//       console.log(`Attempting to execute ${interaction.commandName}`);
+//       await command.execute(interaction);
+//   } catch (error) {
+//       console.error(`Error executing ${interaction.commandName}`, error);
+//       if (interaction.replied || interaction.deferred) {
+//           await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+//       } else {
+//           await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+//       }
+//   }
+// });
 
 // Deploy commands when the bot starts
 const deployCommands = async () => {
