@@ -20,7 +20,7 @@ module.exports = {
         const fetchedMessages = await fetchMessages(channel);
         await interaction.editReply("Waiting for messages");
 
-        await analyzeMessages(fetchedMessages);
+        analyzeMessages(fetchedMessages);
         await wait(4_000);
         await interaction.followUp({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
     },
@@ -38,27 +38,21 @@ async function fetchMessages(channel) {
         }
 
         const messages = await channel.messages.fetch(options);
+        console.log(`Fetched ${messages.size} messages`);
+
         if (messages.size === 0) {
             break;
         }
 
-        fetchedMessages.concat(messages);
+        messages.forEach(msg => fetchedMessages.set(msg.id, msg));
         lastId = messages.last().id;
     }
-    if(fetchedMessages == null)
-    {
-        console.log("messages are null");
-    }
-    else
-    {
-        console.log("messages:");
-        console.log(fetchedMessages);
-    }
+    console.log(`Total fetched messages: ${fetchedMessages.size}`);
     return fetchedMessages;
 }
 
-async function analyzeMessages(messages) {
-    console.log("analyzing Messages");
+function analyzeMessages(messages) {
+    console.log("Analyzing Messages");
     messages.forEach(message => {
         if (message.author.bot) return;
         const content = message.content.toLowerCase();

@@ -63,7 +63,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildEmojisAndStickers
+    GatewayIntentBits.GuildEmojisAndStickers,
   ],
 });
 global.discordClient = client;
