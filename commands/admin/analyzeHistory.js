@@ -30,9 +30,12 @@ async function fetchMessages(channel) {
     const fetchedMessages = new Collection();
     let lastId = null;
     const limit = 100;
+    let totalFetched = 0;
+
     console.log("Fetching Messages");
-    while (true) {
-        const options = { limit };
+
+    while (totalFetched < 100) {
+        const options = { limit: Math.min(100 - totalFetched, limit) };
         if (lastId) {
             options.before = lastId;
         }
@@ -45,8 +48,10 @@ async function fetchMessages(channel) {
         }
 
         messages.forEach(msg => fetchedMessages.set(msg.id, msg));
+        totalFetched += messages.size;
         lastId = messages.last().id;
     }
+
     console.log(`Total fetched messages: ${fetchedMessages.size}`);
     return fetchedMessages;
 }
