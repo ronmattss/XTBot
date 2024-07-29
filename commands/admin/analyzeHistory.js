@@ -31,24 +31,25 @@ async function fetchMessages(channel) {
     let lastId = null;
     const limit = 100;
     let totalFetched = 0;
+    let whileLimit = 0;
 
     console.log("Fetching Messages");
 
-    while (totalFetched < 100) {
+    while (whileLimit < 100) {
         const options = { limit: Math.min(100 - totalFetched, limit) };
         if (lastId) {
             options.before = lastId;
         }
 
         const messages = await channel.messages.fetch(options);
-        console.log(`${totalFetched} Fetched ${messages.size} messages`);
+        console.log(`${whileLimit} Fetched ${messages.size} messages`);
 
         if (messages.size === 0) {
             break;
         }
 
         messages.forEach(msg => fetchedMessages.set(msg.id, msg));
-        totalFetched++;
+        whileLimit++;
         lastId = messages.last().id;
     }
 
