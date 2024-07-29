@@ -26,11 +26,12 @@ module.exports = {
     },
 };
 
+
 async function fetchMessages(channel) {
     const fetchedMessages = new Collection();
     let lastId = null;
     const limit = 100;
-    let totalFetched = 0;
+    let totalFetched = 1;
     let whileLimit = 0;
 
     console.log("Fetching Messages");
@@ -45,15 +46,20 @@ async function fetchMessages(channel) {
         whileLimit++;
         console.log(`:${whileLimit} Fetching ${messages.size} messages`);
 
-        if (messages.size === 0) {
+        if (messages.size === 0 || totalFetched >= 100) {
             break;
         }
 
         messages.forEach(msg => fetchedMessages.set(msg.id, msg));
         lastId = messages.last().id;
+        totalFetched += messages.size;
     }
 
     console.log(`Total fetched messages: ${fetchedMessages.size}`);
+
+    // Save messages to a JSON file
+    saveMessagesToFile(fetchedMessages);
+
     return fetchedMessages;
 }
 
@@ -68,4 +74,19 @@ function analyzeMessages(messages) {
     });
 }
 
+function saveMessagesToFile(messages) {
+    const messagesArray = Array.from(messages.values()).map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        author: {
+            id: msg.author.id,
+            username: msg.author.username,
+            discriminator: msg.author.discriminator
+        },
+        createdAt: msg.createdAt
+    }));
 
+    const filePath = path.join(__dirname, 'json', 'messages.json');
+    fs.writeFileSync(filePath, JSON.stringify(messagesArray, null, 2), 'utf8');
+    console.log(`Messages saved to ${filePath}`);
+}
