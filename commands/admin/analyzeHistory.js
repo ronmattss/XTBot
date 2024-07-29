@@ -94,7 +94,7 @@ function saveMessagesToFile(messages) {
         createdAt: message.createdAt
     }));
 
-    const filePath = path.join(__dirname, '../../json/messages.json');
+    const filePath = path.join(__dirname, '../../json/messageHistory.json');
 
     // Ensure the directory exists
     if (!fs.existsSync(path.dirname(filePath))) {
