@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits,Intents  } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, Intents } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { REST } = require('@discordjs/rest');
@@ -20,34 +20,34 @@ const notificationChannelId = '1183248453606850570'; // Replace with your channe
 const notificationUserId = '400626723181428737'; // Replace with the user ID to notify
 const clientId = '1122447858860314685';
 const guildId = '400626052197646336';
-  // Express middleware to parse JSON requests
-  app.use(bodyParser.json());
-  
-  // Endpoint to receive data from Arduino
-  app.post('/arduino-data', (req, res) => {
-	const { data } = req.body;
-	
-	// Process the data from Arduino
-	console.log('Received data from Arduino:', data);
-  
-	// You can send a response back if needed
-	//res.send('Data received successfully!');
-  });
-  app.get('/sample', (req, res) => {
-	console.log('Hello');
-	res.send('Hello from the server!');
-  });
+// Express middleware to parse JSON requests
+app.use(bodyParser.json());
 
-  app.post('/sendReadings', (req, res) => {
-	// Access the JSON data sent from Arduino
-	const jsonData = req.body;
-  
-	// Process the data as needed
-	console.log('Received JSON data:', jsonData);
-	sendReadingsToDiscord(jsonData);
-	// Send a response if necessary
-	res.json({ message: 'Data received successfully' });
-  });
+// Endpoint to receive data from Arduino
+app.post('/arduino-data', (req, res) => {
+  const { data } = req.body;
+
+  // Process the data from Arduino
+  console.log('Received data from Arduino:', data);
+
+  // You can send a response back if needed
+  //res.send('Data received successfully!');
+});
+app.get('/sample', (req, res) => {
+  console.log('Hello');
+  res.send('Hello from the server!');
+});
+
+app.post('/sendReadings', (req, res) => {
+  // Access the JSON data sent from Arduino
+  const jsonData = req.body;
+
+  // Process the data as needed
+  console.log('Received JSON data:', jsonData);
+  sendReadingsToDiscord(jsonData);
+  // Send a response if necessary
+  res.json({ message: 'Data received successfully' });
+});
 
 
 
@@ -56,13 +56,15 @@ const initialWord = config.initialWord;
 wordLeaderboard.setWordToTrack(initialWord);
 
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers,
-		GatewayIntentBits.GuildVoiceStates,
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMessageReactions
-    ],
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildEmojisAndStickers
+  ],
 });
 global.discordClient = client;
 client.commands = new Collection();
@@ -71,18 +73,18 @@ const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const filePath = path.join(commandsPath, file);
-		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
-		if ('data' in command && 'execute' in command) {
-			client.commands.set(command.data.name, command);
-		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-		}
-	}
+  const commandsPath = path.join(foldersPath, folder);
+  const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    const command = require(filePath);
+    // Set a new item in the Collection with the key as the command name and the value as the exported module
+    if ('data' in command && 'execute' in command) {
+      client.commands.set(command.data.name, command);
+    } else {
+      console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    }
+  }
 }
 
 
@@ -90,13 +92,13 @@ const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
+  }
 }
 
 
@@ -116,7 +118,7 @@ for (const file of eventFiles) {
 // 		}
 // 	}
 // 	setTimeout(() => {
-			
+
 // 		// Check if the member is still in a voice channel before disconnecting
 // 		if (oldState.member.user.tag === "skevved#0") {
 // 			console.log(`${oldState.member.user.tag} disconnecting...`);
@@ -129,7 +131,7 @@ for (const file of eventFiles) {
 //     if (!oldState.channel && newState.channel) {
 //         console.log(`${newState.member.user.tag} joined a voice channel: ${newState.channel.name}`);
 //         setTimeout(() => {
-			
+
 // 			console.log(`disconnecting after ${disconnectDelay}`)
 //             // Check if the member is still in a voice channel before disconnecting
 //             if (newState.member.user.tag === "skevved#0") {
@@ -156,23 +158,23 @@ client.on('messageCreate', message => {
   console.log(`reading message: ${message.author}: ${message.content}}`);
   const content = message.content.toLowerCase();
   if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
-      wordLeaderboard.updateLeaderboard(message.author.id);
-      console.log(`Added tally: ${message.author.id}` );
+    wordLeaderboard.updateLeaderboard(message.author.id);
+    console.log(`Added tally: ${message.author.id}`);
   }
 });
 
 
 
 client.once('ready', async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    const channel = client.channels.cache.get(notificationChannelId);
+  console.log(`Logged in as ${client.user.tag}!`);
+  const channel = client.channels.cache.get(notificationChannelId);
 
-    if (channel) {
-        await channel.send({ content: 'Bot is now online!', ephemeral: true });
-    } else {
-        console.error(`Notification channel with ID ${notificationChannelId} not found.`);
-    }
-   // await deployCommands();
+  if (channel) {
+    await channel.send({ content: 'Bot is now online!', ephemeral: true });
+  } else {
+    console.error(`Notification channel with ID ${notificationChannelId} not found.`);
+  }
+  // await deployCommands();
 });
 
 // client.on('interactionCreate', async interaction => {
@@ -197,45 +199,45 @@ client.once('ready', async () => {
 
 // Deploy commands when the bot starts
 const deployCommands = async () => {
-    const commands = [];
-    for (const [name, command] of client.commands) {
-        commands.push(command.data.toJSON());
+  const commands = [];
+  for (const [name, command] of client.commands) {
+    commands.push(command.data.toJSON());
+  }
+
+  const rest = new REST({ version: '10' }).setToken(loginToken);
+  try {
+    console.log('Started refreshing application (/) commands.');
+
+    const existingCommands = await rest.get(
+      Routes.applicationGuildCommands(clientId, guildId)
+    );
+
+    const newCommands = commands.filter(cmd =>
+      !existingCommands.some(existingCmd => existingCmd.name === cmd.name)
+    );
+
+    for (const command of newCommands) {
+      await rest.post(
+        Routes.applicationGuildCommands(clientId, guildId),
+        { body: command }
+      );
     }
 
-    const rest = new REST({ version: '10' }).setToken(loginToken);
-    try {
-        console.log('Started refreshing application (/) commands.');
-
-        const existingCommands = await rest.get(
-            Routes.applicationGuildCommands(clientId, guildId)
-        );
-
-        const newCommands = commands.filter(cmd => 
-            !existingCommands.some(existingCmd => existingCmd.name === cmd.name)
-        );
-
-        for (const command of newCommands) {
-            await rest.post(
-                Routes.applicationGuildCommands(clientId, guildId),
-                { body: command }
-            );
-        }
-
-        console.log(`Successfully added ${newCommands.length} new commands.`);
-    } catch (error) {
-        console.error(error);
-    }
+    console.log(`Successfully added ${newCommands.length} new commands.`);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 deployCommands();
 
 function sendReadingsToDiscord(data) {
-	const channel = client.channels.cache.get("1183248453606850570");
-  
-	if (channel) {
-	  const timestamp = new Date().toLocaleString(); // Get the current date and time
-  
-	  const message = `
+  const channel = client.channels.cache.get("1183248453606850570");
+
+  if (channel) {
+    const timestamp = new Date().toLocaleString(); // Get the current date and time
+
+    const message = `
 		**Timestamp:** ${timestamp}
 		**Temperature:** ${data.bme280.currentTemp} °C
 		**Humidity:** ${data.bme280.currentHumidity} %
@@ -243,21 +245,21 @@ function sendReadingsToDiscord(data) {
 		**Pressure:** ${data.bme280.currentPressure} hPa
 		**PPM:** ${data.currentPPM}
 	  `;
-  
-	  channel.send(message);
-	} else {
-	  console.error(`Channel with ID ${"1183248453606850570"} not found.`);
-	}
-  }
 
-  // Start the Express server
-  const serverIPAddress = require('ip').address();
-  console.log(`Server IP Address: ${serverIPAddress}`);
-  
-  // Start the Express server
-  const server = app.listen(port, () => {
-	console.log(`Express server listening on http://${serverIPAddress}:${port}`);
-  });
+    channel.send(message);
+  } else {
+    console.error(`Channel with ID ${"1183248453606850570"} not found.`);
+  }
+}
+
+// Start the Express server
+const serverIPAddress = require('ip').address();
+console.log(`Server IP Address: ${serverIPAddress}`);
+
+// Start the Express server
+const server = app.listen(port, () => {
+  console.log(`Express server listening on http://${serverIPAddress}:${port}`);
+});
 
 
 //   client.on('interactionCreate', async interaction => {
