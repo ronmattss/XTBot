@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { Collection } = require('discord.js');
-const wordLeaderboard = require('../../wordLeaderboard');
+const { SlashCommandBuilder, Collection } = require('discord.js');
+const wordLeaderboard = require('./wordLeaderboard');
 
 module.exports = {
     data: new SlashCommandBuilder()
