@@ -41,7 +41,7 @@ async function fetchMessages(channel) {
         }
 
         const messages = await channel.messages.fetch(options);
-        console.log(`Fetched ${messages.size} messages`);
+        console.log(`${totalFetched} Fetched ${messages.size} messages`);
 
         if (messages.size === 0) {
             break;
