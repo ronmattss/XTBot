@@ -8,6 +8,7 @@ const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
 const config = require('./wordTrackerConfig.json');
 const wordLeaderboard = require('./commands/admin/wordLeaderboard');
+const { debug } = require('node:console');
 
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
 const loginToken = process.env.DISCORD_TOKEN;
@@ -154,6 +155,7 @@ client.on('messageCreate', message => {
   const content = message.content.toLowerCase();
   if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
       wordLeaderboard.updateLeaderboard(message.author.id);
+      console.log(`Added tally: ${message.author.id}` );
   }
 });
 
