@@ -48,7 +48,7 @@ async function fetchMessages(channel) {
         }
 
         messages.forEach(msg => fetchedMessages.set(msg.id, msg));
-        totalFetched += messages.size;
+        totalFetched++;
         lastId = messages.last().id;
     }
 
