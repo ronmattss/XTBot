@@ -16,10 +16,11 @@ module.exports = {
             await interaction.reply({ content: `Channel with ID ${channelId} not found.`, ephemeral: true });
             return;
         }
-
+        await interaction.deferReply();
         const fetchedMessages = await fetchMessages(channel);
         analyzeMessages(fetchedMessages);
-        await interaction.reply({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
+        await wait(4_000);
+        await interaction.editReply({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
     },
 };
 
