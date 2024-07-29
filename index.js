@@ -6,6 +6,9 @@ const bodyParser = require('body-parser');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
+const config = require('./wordTrackerConfig.json');
+const wordLeaderboard = require('./wordLeaderboard');
+
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
 const loginToken = process.env.DISCORD_TOKEN;
 const clientID = process.env.DISCORD_CLIENT;
@@ -45,6 +48,11 @@ const guildId = '400626052197646336';
 	res.json({ message: 'Data received successfully' });
   });
 
+
+
+// Initialize tracked word from config
+const initialWord = config.initialWord;
+wordLeaderboard.setWordToTrack(initialWord);
 
 const client = new Client({
     intents: [
@@ -135,18 +143,18 @@ for (const file of eventFiles) {
 
 
 
+
 function disconnectAfterDelay(member, delay) {
 
 }
 
 client.on('messageCreate', message => {
-    if (message.author.bot) return;
+  if (message.author.bot) return;
 
-    const content = message.content.toLowerCase();
-    const trackWordCommand = client.commands.get('trackword');
-    if (content.includes(trackWordCommand.getWordToTrack().toLowerCase())) {
-        trackWordCommand.updateLeaderboard(message.author.id);
-    }
+  const content = message.content.toLowerCase();
+  if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
+      wordLeaderboard.updateLeaderboard(message.author.id);
+  }
 });
 
 

@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
-const wait = require('node:timers/promises').setTimeout;
+const { Collection } = require('discord.js');
+const wordLeaderboard = require('../../wordLeaderboard');
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('analyzehistory')
@@ -18,7 +20,7 @@ module.exports = {
 
         const fetchedMessages = await fetchMessages(channel);
         analyzeMessages(fetchedMessages);
-        await interaction.reply({ content: `Analyzed past messages for the word: "${require('./trackword').getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
+        await interaction.reply({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
     },
 };
 
@@ -49,9 +51,8 @@ function analyzeMessages(messages) {
     messages.forEach(message => {
         if (message.author.bot) return;
         const content = message.content.toLowerCase();
-        const trackWordCommand = require('./trackword');
-        if (content.includes(trackWordCommand.getWordToTrack().toLowerCase())) {
-            trackWordCommand.updateLeaderboard(message.author.id);
+        if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
+            wordLeaderboard.updateLeaderboard(message.author.id);
         }
     });
 }

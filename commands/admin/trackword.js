@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const wordLeaderboard = require('./wordLeaderboard');
+const wordLeaderboard = require('../../wordLeaderboard');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,9 +11,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const newWord = interaction.options.getString('word');
-        wordLeaderboard.data.wordToTrack = newWord;
-        wordLeaderboard.leaderboard = {}; // Reset leaderboard
-
+        wordLeaderboard.setWordToTrack(newWord);
         await interaction.reply({ content: `Tracking word set to "${newWord}".`, ephemeral: true });
     }
 };
