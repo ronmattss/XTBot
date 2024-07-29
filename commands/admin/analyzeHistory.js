@@ -45,7 +45,7 @@ async function fetchMessages(channel) {
         const messages = await channel.messages.fetch(options);
         console.log(`Fetched ${messages.size} messages`);
 
-        if (messages.size === 0) {
+        if (messages.size === 0 || totalFetched >= 100) {
             break;
         }
 
@@ -73,6 +73,15 @@ function analyzeMessages(messages) {
     });
 }
 
+// Function to read existing messages from the file
+function readExistingMessages(filePath) {
+    if (fs.existsSync(filePath)) {
+        const data = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(data);
+    }
+    return [];
+}
+
 function saveMessagesToFile(messages) {
     const messagesArray = Array.from(messages.values()).map(msg => ({
         id: msg.id,
@@ -85,10 +94,17 @@ function saveMessagesToFile(messages) {
         createdAt: msg.createdAt
     }));
 
-    const filePath = path.join(__dirname, 'json', 'messages.json');
+    const filePath = path.join(__dirname, '../../json/messages.json');
+
+    // Ensure the directory exists
     if (!fs.existsSync(path.dirname(filePath))) {
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
     }
-    fs.writeFileSync(filePath, JSON.stringify(messagesArray, null, 2), 'utf8');
+
+    // Read existing messages and combine with new ones
+    const existingMessages = readExistingMessages(filePath);
+    const combinedMessages = existingMessages.concat(messagesArray);
+
+    fs.writeFileSync(filePath, JSON.stringify(combinedMessages, null, 2), 'utf8');
     console.log(`Messages saved to ${filePath}`);
 }

@@ -8,6 +8,7 @@ const { Routes } = require('discord-api-types/v9');
 require('dotenv').config();
 const config = require('./wordTrackerConfig.json');
 const wordLeaderboard = require('./commands/admin/wordLeaderboard');
+
 const { debug } = require('node:console');
 const messagesFilePath = path.join(__dirname, 'json', 'messages.json');
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
@@ -169,10 +170,14 @@ client.on('messageCreate', message => {
   if (message.author.bot) return;
 
   const messageData = {
-      id: message.id,
-      content: message.content,
-      author: message.author.tag,
-      timestamp: message.createdTimestamp,
+    id: msg.id,
+    content: msg.content,
+    author: {
+        id: msg.author.id,
+        username: msg.author.username,
+        discriminator: msg.author.discriminator
+    },
+    createdAt: msg.createdAt
   };
 
   messages.push(messageData);
@@ -296,5 +301,5 @@ const server = app.listen(port, () => {
 //     }
 // });
 
-console.log("NEW Build");
+console.log("NEW Build!");
 client.login(loginToken);
