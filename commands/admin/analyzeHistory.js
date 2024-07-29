@@ -29,7 +29,7 @@ module.exports = {
 async function fetchMessages(channel) {
     const fetchedMessages = new Collection();
     let lastId = null;
-    const limit = 500;
+    const limit = 100;
     console.log("Fetching Messages");
     while (true) {
         const options = { limit };
