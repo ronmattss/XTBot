@@ -18,17 +18,19 @@ module.exports = {
         }
         await interaction.deferReply();
         const fetchedMessages = await fetchMessages(channel);
-        analyzeMessages(fetchedMessages);
+        await interaction.editReply("Waiting for messages");
+
+        await analyzeMessages(fetchedMessages);
         await wait(4_000);
-        await interaction.editReply({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
+        await interaction.followUp({ content: `Analyzed past messages for the word: "${wordLeaderboard.getWordToTrack()}" in channel ${channelId}`, ephemeral: true });
     },
 };
 
 async function fetchMessages(channel) {
     const fetchedMessages = new Collection();
     let lastId = null;
-    const limit = 100;
-
+    const limit = 500;
+    console.log("Fetching Messages");
     while (true) {
         const options = { limit };
         if (lastId) {
@@ -47,7 +49,8 @@ async function fetchMessages(channel) {
     return fetchedMessages;
 }
 
-function analyzeMessages(messages) {
+async function analyzeMessages(messages) {
+    console.log("analyzing Messages");
     messages.forEach(message => {
         if (message.author.bot) return;
         const content = message.content.toLowerCase();
