@@ -9,7 +9,7 @@ require('dotenv').config();
 const config = require('./wordTrackerConfig.json');
 const wordLeaderboard = require('./commands/admin/wordLeaderboard');
 const { debug } = require('node:console');
-
+const messagesFilePath = path.join(__dirname, 'json', 'messages.json');
 //const { token } = require(path.join('C:', 'keys', 'config.json'));
 const loginToken = process.env.DISCORD_TOKEN;
 const clientID = process.env.DISCORD_CLIENT;
@@ -51,9 +51,6 @@ app.post('/sendReadings', (req, res) => {
 
 
 
-// Initialize tracked word from config
-const initialWord = config.initialWord;
-wordLeaderboard.setWordToTrack(initialWord);
 
 const client = new Client({
   intents: [
@@ -101,7 +98,22 @@ for (const file of eventFiles) {
   }
 }
 
+// Ensure the directory exists
+if (!fs.existsSync(path.dirname(messagesFilePath))) {
+  fs.mkdirSync(path.dirname(messagesFilePath), { recursive: true });
+}
 
+
+// Load existing messages or initialize an empty array
+let messages = [];
+if (fs.existsSync(messagesFilePath)) {
+    messages = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
+} else {
+    fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
+}
+// Initialize tracked word from config
+const initialWord = config.initialWord;
+wordLeaderboard.setWordToTrack(initialWord);
 
 
 // Event Handlers
@@ -155,14 +167,18 @@ function disconnectAfterDelay(member, delay) {
 
 client.on('messageCreate', message => {
   if (message.author.bot) return;
-  console.log(`reading message: ${message.author}: ${message.content}}`);
-  const content = message.content.toLowerCase();
-  if (content.includes(wordLeaderboard.getWordToTrack().toLowerCase())) {
-    wordLeaderboard.updateLeaderboard(message.author.id);
-    console.log(`Added tally: ${message.author.id}`);
-  }
-});
 
+  const messageData = {
+      id: message.id,
+      content: message.content,
+      author: message.author.tag,
+      timestamp: message.createdTimestamp,
+  };
+
+  messages.push(messageData);
+  fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
+  console.log(`Message from ${message.author.tag} saved.`);
+});
 
 
 client.once('ready', async () => {

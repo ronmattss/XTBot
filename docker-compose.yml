@@ -2,10 +2,15 @@ version: '3.8'
 
 services:
   xtbot:
-    image: xtbot-image
     build: .
-    environment:
-      - DISCORD_TOKEN=${DISCORD_TOKEN}
     ports:
       - "3000:3000"
-    restart: unless-stopped
+    environment:
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      DISCORD_CLIENT: ${DISCORD_CLIENT}
+      DISCORD_GUILD: ${DISCORD_GUILD}
+    volumes:
+      - json_data:/usr/src/app/json
+
+volumes:
+  json_data:
