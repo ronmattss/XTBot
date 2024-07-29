@@ -45,7 +45,15 @@ async function fetchMessages(channel) {
         fetchedMessages.concat(messages);
         lastId = messages.last().id;
     }
-
+    if(fetchedMessages == null)
+    {
+        console.log("messages are null");
+    }
+    else
+    {
+        console.log("messages:");
+        console.log(fetchedMessages);
+    }
     return fetchedMessages;
 }
 
