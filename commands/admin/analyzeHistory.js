@@ -42,6 +42,7 @@ async function fetchMessages(channel) {
         }
 
         const messages = await channel.messages.fetch(options);
+        whileLimit++;
         console.log(`${whileLimit} Fetched ${messages.size} messages`);
 
         if (messages.size === 0) {
@@ -49,7 +50,6 @@ async function fetchMessages(channel) {
         }
 
         messages.forEach(msg => fetchedMessages.set(msg.id, msg));
-        whileLimit++;
         lastId = messages.last().id;
     }
 
