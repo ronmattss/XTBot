@@ -106,9 +106,9 @@ if (!fs.existsSync(path.dirname(messagesFilePath))) {
 
 
 // Load existing messages or initialize an empty array
-let messages = [];
+let messagess = [];
 if (fs.existsSync(messagesFilePath)) {
-    messages = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
+  messagess = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
 } else {
     fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
 }
@@ -162,8 +162,22 @@ wordLeaderboard.setWordToTrack(initialWord);
 
 
 
-function disconnectAfterDelay(member, delay) {
+// Function to read existing messages from the file
+function readExistingMessages(filePath) {
+  if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(data);
+  }
+  return [];
+}
 
+
+let messages = [];
+
+// Read existing messages from the file at startup
+if (fs.existsSync(messagesFilePath)) {
+  const existingData = fs.readFileSync(messagesFilePath, 'utf8');
+  messages = JSON.parse(existingData);
 }
 
 client.on('messageCreate', message => {
@@ -173,9 +187,9 @@ client.on('messageCreate', message => {
     id: message.id,
     content: message.content,
     author: {
-        id: message.author.id,
-        username: message.author.username,
-        discriminator: message.author.discriminator
+      id: message.author.id,
+      username: message.author.username,
+      discriminator: message.author.discriminator
     },
     createdAt: message.createdAt
   };
@@ -184,7 +198,6 @@ client.on('messageCreate', message => {
   fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2));
   console.log(`Message from ${message.author.tag} saved.`);
 });
-
 
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
