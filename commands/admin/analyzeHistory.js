@@ -83,15 +83,15 @@ function readExistingMessages(filePath) {
 }
 
 function saveMessagesToFile(messages) {
-    const messagesArray = Array.from(messages.values()).map(msg => ({
-        id: msg.id,
-        content: msg.content,
+    const messagesArray = Array.from(messages.values()).map(message => ({
+        id: message.id,
+        content: message.content,
         author: {
-            id: msg.author.id,
-            username: msg.author.username,
-            discriminator: msg.author.discriminator
+            id: message.author.id,
+            username: message.author.username,
+            discriminator: message.author.discriminator
         },
-        createdAt: msg.createdAt
+        createdAt: message.createdAt
     }));
 
     const filePath = path.join(__dirname, '../../json/messages.json');

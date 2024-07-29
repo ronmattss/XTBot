@@ -170,14 +170,14 @@ client.on('messageCreate', message => {
   if (message.author.bot) return;
 
   const messageData = {
-    id: msg.id,
-    content: msg.content,
+    id: message.id,
+    content: message.content,
     author: {
-        id: msg.author.id,
-        username: msg.author.username,
-        discriminator: msg.author.discriminator
+        id: message.author.id,
+        username: message.author.username,
+        discriminator: message.author.discriminator
     },
-    createdAt: msg.createdAt
+    createdAt: message.createdAt
   };
 
   messages.push(messageData);
@@ -301,5 +301,5 @@ const server = app.listen(port, () => {
 //     }
 // });
 
-console.log("NEW Build!");
+console.log("NEW Build!!");
 client.login(loginToken);
